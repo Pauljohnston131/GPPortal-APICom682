@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/18ac9998-0eda-434e-8ae6-319aa4a80356/resourceGroups/com682-gpportal/providers/Microsoft.Web/sites/gpportal-api",
+    "appService.deploySubpath": "."
+}
