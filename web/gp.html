@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>NHS GP Clinical Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body { font-family: 'Roboto', sans-serif; background: #f0f4f8; }
+        .header { background: #004D8C; color: white; padding: 20px; text-align: center; font-size: 26px; font-weight: 700; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .record-item {
+            padding: 14px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 8px; margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+        .record-item:hover { background: #e3f2fd; transform: translateY(-2px); }
+        .record-item.selected { background: #bbdefb; border-left: 5px solid #005EB8; }
+        .thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .status-badge {
+            padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+        }
+        .status-pending { background: #ffebee; color: #c62828; }
+        .status-under_review { background: #fff3e0; color: #ef6c00; }
+        .status-reviewed { background: #e8f5e8; color: #2e7d32; }
+        .status-action_required { background: #e3f2fd; color: #1565c0; }
+        .detail-panel img { max-width: 100%; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    </style>
+</head>
+<body>
+
+<div class="header">NHS GP Clinical Dashboard</div>
+
+<div class="container mt-4">
+    <div class="row g-4">
+        <!-- Left: Search -->
+        <div class="col-lg-3">
+            <div class="card p-4">
+                <h5>Find Patient</h5>
+                <input id="gpPatientId" class="form-control form-control-lg mb-3" placeholder="Patient ID (e.g. P004)">
+                <button id="gpLoadBtn" class="btn btn-primary w-100 mb-3">Load Records</button>
+                <hr>
+                <select id="filterStatus" class="form-select">
+                    <option value="">All Records</option>
+                    <option value="pending">Pending</option>
+                    <option value="under_review">Under Review</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="action_required">Action Required</option>
+                </select>
+                <button id="applyFilter" class="btn btn-outline-secondary w-100 mt-2">Apply Filter</button>
+            </div>
+        </div>
+
+        <!-- Middle: List -->
+        <div class="col-lg-5">
+            <div class="card p-4" style="max-height: 80vh; overflow-y: auto;">
+                <h5>Patient Evidence</h5>
+                <div id="gpRecordsList"></div>
+            </div>
+        </div>
+
+        <!-- Right: Details -->
+        <div class="col-lg-4">
+            <div class="card p-4" id="detailPanel">
+                <h5>Review Record</h5>
+                <div id="detailContent" style="display:none;">
+                    <img id="detailImage" class="mb-3">
+                    <p><strong>File:</strong> <span id="detailFile"></span></p>
+                    <p><strong>Uploaded:</strong> <span id="detailDate"></span></p>
+
+                    <label class="form-label fw-bold">Clinical Status</label>
+                    <select id="detailStatus" class="form-select mb-3">
+                        <option value="pending">Pending Review</option>
+                        <option value="under_review">Under Review</option>
+                        <option value="reviewed">Reviewed – No Action</option>
+                        <option value="action_required">Action Required</option>
+                    </select>
+
+                    <label class="form-label fw-bold">GP Notes</label>
+                    <textarea id="detailNotes" class="form-control mb-3" rows="5" placeholder="Add clinical notes..."></textarea>
+
+                    <button id="saveDetail" class="btn btn-success">Save Notes</button>
+                    <button id="deleteDetail" class="btn btn-danger">Delete Record</button>
+                    <span id="detailMsg" class="ms-3"></span>
+                </div>
+                <p class="text-muted" id="noSelection">Select a record to review</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/gp.js"></script>
+</body>
+</html>
