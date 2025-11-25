@@ -8,31 +8,22 @@ variables:
   pythonVersion: 3.11
 
 steps:
-
-# -------------------------
-# 1. Checkout Repo
-# -------------------------
+# 1. Checkout source
 - checkout: self
 
-# -------------------------
-# 2. Set Python Version
-# -------------------------
+# 2. Setup Python
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(pythonVersion)'
   displayName: 'Use Python $(pythonVersion)'
 
-# -------------------------
-# 3. Install Requirements
-# -------------------------
+# 3. Install pip dependencies
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
   displayName: 'Install dependencies'
 
-# -------------------------
-# 4. Create deployment package (ZIP)
-# -------------------------
+# 4. Create deployment package
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
@@ -40,24 +31,21 @@ steps:
     archiveType: zip
     archiveFile: '$(Build.ArtifactStagingDirectory)/gpportal.zip'
     replaceExistingArchive: true
-  displayName: 'Create deployment zip'
+  displayName: 'Archive app'
 
-# -------------------------
-# 5. Publish Artifact
-# -------------------------
+# 5. Publish build artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/gpportal.zip'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-  displayName: 'Publish build artifact'
 
-# -------------------------
-# 6. Deploy to Azure Web App
-# -------------------------
+# 6. Deploy to Azure App Service
 - task: AzureWebApp@1
-  displayName: 'Deploy GPPortal API to Azure App Service'
+  displayName: 'Deploy GPPortal API'
   inputs:
-    azureSubscription: 'gpportal-connection'   # << YOUR SERVICE CONNECTION NAME
+    azureSubscription: 'gpportal-connection'
     appName: 'gpportal-api'
     package: '$(Build.ArtifactStagingDirectory)/gpportal.zip'
+    appType: 'webAppLinux'
+
