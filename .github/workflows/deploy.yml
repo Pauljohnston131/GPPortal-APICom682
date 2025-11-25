@@ -1,0 +1,37 @@
+name: Deploy GPPortal API to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde3bed4c79f556e26be6c5c79b45d2f8c0d1
+
+      - name: Set up Python
+        uses: actions/setup-python@65ebd108b01c29f407f2df3561ffe2f95ca49fbe
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Zip artifact for deployment
+        run: zip -r release.zip . -x "*.git*"
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@21e4dc8f2dd50cbeec45e4f1bcdce8c22cd2ad68
+        with:
+          app-name: gpportal-api
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release.zip
