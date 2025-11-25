@@ -1,94 +1,371 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>NHS Patient Portal – Upload Medical Evidence</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Patient Portal – Multimedia GP Portal</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
-        body { font-family: 'Roboto', sans-serif; background: #f5f8fa; margin: 0; }
+        :root {
+            --nhs-blue: #005eb8;
+            --nhs-light-blue: #0072ce;
+            --nhs-dark-blue: #003087;
+            --nhs-green: #009639;
+            --nhs-light-green: #78BE20;
+            --nhs-grey: #425563;
+            --nhs-light-grey: #f4f8fb;
+            --nhs-mid-grey: #dce3e8;
+            --nhs-white: #ffffff;
+            --nhs-black: #231f20;
+        }
+        
+        body {
+            background: var(--nhs-light-grey);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--nhs-black);
+            line-height: 1.5;
+        }
+
         .nhs-header {
-            background: #005EB8; color: white; padding: 20px 0; text-align: center; font-size: 28px; font-weight: 700;
+            background: var(--nhs-blue);
+            padding: 18px 0;
+            color: var(--nhs-white);
+            font-size: 24px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
         }
-        .nhs-logo { font-size: 36px; font-weight: bold; }
-        .container { max-width: 1000px; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        .nhs-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--nhs-light-green);
+        }
+
+        .portal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .section-card {
+            background: var(--nhs-white);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--nhs-mid-grey);
+        }
+
+        .section-title {
+            color: var(--nhs-dark-blue);
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--nhs-light-green);
+        }
+
         .upload-area {
-            border: 3px dashed #0072CE; border-radius: 12px; padding: 40px; text-align: center; background: #f8fbff;
-            transition: all 0.3s; cursor: pointer;
+            border: 2px dashed var(--nhs-light-blue);
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 8px;
+            background: var(--nhs-white);
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .upload-area:hover { background: #e8f4ff; border-color: #005EB8; }
-        .preview-img { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        .upload-area:hover, .upload-area.dragover {
+            background: #e8f3ff;
+            border-color: var(--nhs-blue);
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--nhs-light-blue);
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--nhs-grey);
+            margin-bottom: 8px;
+        }
+
+        .btn-nhs-primary {
+            background: var(--nhs-blue);
+            border-color: var(--nhs-blue);
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+        }
+
+        .btn-nhs-primary:hover {
+            background: var(--nhs-dark-blue);
+            border-color: var(--nhs-dark-blue);
+        }
+
+        .btn-nhs-secondary {
+            background: var(--nhs-white);
+            border-color: var(--nhs-blue);
+            color: var(--nhs-blue);
+            font-weight: 600;
+        }
+
+        .btn-nhs-secondary:hover {
+            background: var(--nhs-light-grey);
+            border-color: var(--nhs-dark-blue);
+            color: var(--nhs-dark-blue);
+        }
+
+        .record-card {
+            background: var(--nhs-white);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--nhs-mid-grey);
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+
+        .record-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .preview-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 16px;
+            border-radius: 6px;
+            border: 1px solid var(--nhs-mid-grey);
+        }
+
         .status-badge {
-            padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            text-transform: capitalize;
         }
-        .status-pending { background: #ffe6e6; color: #c41e3a; }
-        .status-under_review { background: #fff4e6; color: #e67e22; }
-        .status-reviewed { background: #e6f7e6; color: #27ae60; }
-        .status-action_required { background: #e6f0ff; color: #2980b9; }
-        .footer { margin-top: 60px; text-align: center; color: #666; font-size: 14px; }
+
+        .status-pending { background: #d9534f; }
+        .status-under_review { background: #f0ad4e; }
+        .status-reviewed { background: #5cb85c; }
+        .status-action_required { background: #0275d8; }
+
+        .info-text {
+            color: var(--nhs-grey);
+            font-size: 14px;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            margin: 16px 0;
+        }
+
+        .progress-bar {
+            background-color: var(--nhs-green);
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--nhs-grey);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: var(--nhs-mid-grey);
+            margin-bottom: 16px;
+        }
+
+        .patient-info-bar {
+            background: var(--nhs-white);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .patient-id-display {
+            font-weight: 600;
+            color: var(--nhs-dark-blue);
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .preview-img {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .section-card {
+                padding: 16px;
+            }
+            
+            .upload-area {
+                padding: 30px 15px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
 <div class="nhs-header">
-    <div class="nhs-logo">NHS</div>
-    Patient Evidence Portal
+    <div class="portal-container">
+        Patient Portal – Upload Medical Evidence
+    </div>
 </div>
 
-<div class="container mt-5">
-    <div class="card p-4 mb-5">
-        <h3 class="mb-3">Upload Evidence for Your GP</h3>
-        <p class="text-muted">Securely share photos or documents (e.g. rash, wound, prescription) with your doctor.</p>
+<div class="portal-container mt-4">
 
-        <form id="uploadForm" class="mt-4">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Your Patient ID</label>
-                    <input id="patientId" class="form-control form-control-lg" placeholder="e.g. P004" required>
-                </div>
-                <div class="col-md-8">
-                    <label class="form-label fw-bold">Choose File</label>
-                    <div class="upload-area" id="dropArea">
-                        <input type="file" id="fileInput" accept="image/*,application/pdf" required style="display:none">
-                        <p class="mb-2"><strong>Click to upload</strong> or drag & drop</p>
-                        <p class="text-muted small">Images (JPG, PNG) or PDF • Max 10MB</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="progress mt-3" style="height:8px; display:none;">
-                <div class="progress-bar bg-success" style="width:0%"></div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-lg mt-4 px-5">Upload to GP</button>
-        </form>
-
-        <div id="msg" class="mt-3 fw-bold"></div>
+    <div class="patient-info-bar">
+        <div>
+            <div class="patient-id-display" id="patientIdDisplay">Patient ID: Not entered</div>
+            <div class="info-text">Enter your Patient ID to view and manage your uploads</div>
+        </div>
+        <button class="btn btn-nhs-secondary" id="refreshBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+            </svg>
+            Refresh
+        </button>
     </div>
 
-    <h4 class="mb-4">Your Uploaded Evidence</h4>
-    <button id="refreshBtn" class="btn btn-outline-primary mb-3">Refresh List</button>
-    <div id="recordsList" class="row g-4"></div>
-</div>
+    <div class="section-card">
+        <h3 class="section-title">Submit Medical Evidence</h3>
+        <p class="info-text">Upload images, documents, or PDFs related to your symptoms or condition for your GP to review.</p>
 
-<div class="footer py-4">
-    © 2025 NHS Digital • Your data is encrypted and only visible to your GP practice
+        <form id="uploadForm" class="mt-4">
+            <div class="mb-4">
+                <label class="form-label">Patient ID</label>
+                <input id="patientId" class="form-control form-control-lg" placeholder="Enter your Patient ID (e.g., P004)" required>
+                <div class="form-text">This ID is provided by your healthcare provider</div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Select File to Upload</label>
+                <div class="upload-area mb-3" id="uploadArea">
+                    <input type="file" id="fileInput" class="d-none" accept="image/*,application/pdf" required>
+                    <div class="upload-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                    </div>
+                    <h5>Upload your file</h5>
+                    <p class="info-text">Click to browse or drag and drop a file here</p>
+                    <p class="info-text">Supported formats: JPG, PNG, PDF (Max 10MB)</p>
+                    <div id="selectedFileName" class="mt-3 fw-bold text-primary" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="progress mb-4" style="display:none;">
+                <div class="progress-bar" role="progressbar" style="width:0%"></div>
+            </div>
+
+            <button class="btn btn-nhs-primary w-100 py-2 fs-5">Upload Evidence</button>
+        </form>
+
+        <div id="msg" class="mt-3 text-center"></div>
+    </div>
+
+    <div class="section-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="section-title mb-0">Your Uploaded Records</h3>
+            <span class="badge bg-secondary" id="recordCount">0 records</span>
+        </div>
+        
+        <div id="recordsList" class="mt-3">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                        <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </div>
+                <h5>No records found</h5>
+                <p class="info-text">Enter your Patient ID and upload files to see them here</p>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/patient.js"></script>
+
 <script>
-    // Enhanced drag & drop
-    const dropArea = document.getElementById('dropArea');
-    ['dragenter', 'dragover'].forEach(e => dropArea.addEventListener(e, () => dropArea.style.background = '#d0e8ff'));
-    ['dragleave', 'drop'].forEach(e => dropArea.addEventListener(e, () => dropArea.style.background = '#f8fbff'));
-    dropArea.addEventListener('drop', e => {
-        e.preventDefault();
-        if (e.dataTransfer.files[0]) fileInput.files = e.dataTransfer.files;
+    // Enhanced patient.js with additional UI functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const patientIdInput = document.getElementById('patientId');
+        const patientIdDisplay = document.getElementById('patientIdDisplay');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const selectedFileName = document.getElementById('selectedFileName');
+        
+        // Update patient ID display
+        patientIdInput.addEventListener('input', function() {
+            const pid = patientIdInput.value.trim();
+            if (pid) {
+                patientIdDisplay.textContent = `Patient ID: ${pid}`;
+            } else {
+                patientIdDisplay.textContent = 'Patient ID: Not entered';
+            }
+        });
+        
+        // Enhanced file upload area interaction
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                selectedFileName.textContent = `Selected: ${fileInput.files[0].name}`;
+                selectedFileName.style.display = 'block';
+            } else {
+                selectedFileName.style.display = 'none';
+            }
+        });
+        
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function() {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                selectedFileName.textContent = `Selected: ${fileInput.files[0].name}`;
+                selectedFileName.style.display = 'block';
+            }
+        });
     });
-    dropArea.addEventListener('click', () => fileInput.click());
 </script>
+
 </body>
 </html>
