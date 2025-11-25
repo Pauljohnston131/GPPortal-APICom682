@@ -5,40 +5,41 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@c85da3f8e815b3f3e17f502588ac26de70f5bf15
+      # Checkout (pinned SHA)
+      - name: Checkout
+        uses: actions/checkout@b4ffde6f017c122b49b0c39551c4d41f82c787f1
 
-    - name: Set up Python
-      uses: actions/setup-python@95e1f3e114634e79346c79e3a485e7d362f6b9a0
-      with:
-        python-version: '3.11'
+      # Set up Python (pinned SHA)
+      - name: Setup Python
+        uses: actions/setup-python@82c7e63155f6bf497520881f83e62eaf8cf9be2f
+        with:
+          python-version: "3.11"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        mkdir build
-        cp -r * build/
+      # Install requirements
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Login to Azure
-      uses: azure/login@f66fcb05d9ab8e7a97113a7f8e4d4e60bc8eed63
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # Archive build for deployment
+      - name: Prepare deployment package
+        run: |
+          zip -r release.zip .
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@ec4c598c0e68b9e69e3f84677db529d75a2e43aa
-      with:
-        app-name: 'gpportal-api'
-        package: './build'
+      # Login to Azure (pinned SHA)
+      - name: Azure Login
+        uses: azure/login@4f79589d572ac16fa3c7a6ffdfd8ad12a2d7a82b
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Deploy to Azure Web App (pinned SHA)
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@01f472563e91b9d4c292e47e03c1b59b7c50c7c5
+        with:
+          app-name: gpportal-api
+          package: release.zip
