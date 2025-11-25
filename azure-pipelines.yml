@@ -1,0 +1,63 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: 3.11
+
+steps:
+
+# -------------------------
+# 1. Checkout Repo
+# -------------------------
+- checkout: self
+
+# -------------------------
+# 2. Set Python Version
+# -------------------------
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(pythonVersion)'
+  displayName: 'Use Python $(pythonVersion)'
+
+# -------------------------
+# 3. Install Requirements
+# -------------------------
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+# -------------------------
+# 4. Create deployment package (ZIP)
+# -------------------------
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: '$(Build.ArtifactStagingDirectory)/gpportal.zip'
+    replaceExistingArchive: true
+  displayName: 'Create deployment zip'
+
+# -------------------------
+# 5. Publish Artifact
+# -------------------------
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/gpportal.zip'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: 'Publish build artifact'
+
+# -------------------------
+# 6. Deploy to Azure Web App
+# -------------------------
+- task: AzureWebApp@1
+  displayName: 'Deploy GPPortal API to Azure App Service'
+  inputs:
+    azureSubscription: 'gpportal-connection'   # << YOUR SERVICE CONNECTION NAME
+    appName: 'gpportal-api'
+    package: '$(Build.ArtifactStagingDirectory)/gpportal.zip'
