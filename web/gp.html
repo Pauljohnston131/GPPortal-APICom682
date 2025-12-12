@@ -2,313 +2,664 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>GP Dashboard – Multimedia GP Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GP Clinical Dashboard – Multimedia Portal</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/styles.css">
     <style>
         :root {
-            --nhs-blue: #005eb8;
-            --nhs-light-blue: #0072ce;
-            --nhs-dark-blue: #003087;
-            --nhs-green: #009639;
-            --nhs-light-green: #78BE20;
-            --nhs-grey: #425563;
-            --nhs-light-grey: #f4f7fb;
-            --nhs-mid-grey: #dce3e8;
-            --nhs-white: #ffffff;
-            --nhs-black: #231f20;
+            --primary-dark: #2D3765;
+            --primary-light: #3b4a68;
+            --accent-blue: #72CFD4;
+            --accent-dark-blue: #5bc0c5;
+            --text-dark: #2D3765;
+            --text-light: #6c7a99;
+            --text-muted: #5e6d8a;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.12);
+            --success: #5cb85c;
+            --warning: #f0ad4e;
+            --danger: #d9534f;
+            --info: #0275d8;
+            --purple: #6f42c1;
         }
         
         body {
-            background: var(--nhs-light-grey);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--nhs-black);
-            line-height: 1.5;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 6rem 1.5rem 3rem;
+            box-sizing: border-box;
         }
 
-        .gp-header {
-            background: var(--nhs-blue);
-            padding: 18px 0;
-            color: var(--nhs-white);
-            font-size: 24px;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            margin-bottom: 24px;
+        /* Header */
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(45, 55, 101, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1.5rem;
         }
-        
-        .gp-header::after {
+
+        .dashboard-title {
+            color: var(--text-dark);
+            font-weight: 800;
+            font-size: 2.2rem;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-title::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: -8px;
             left: 0;
-            right: 0;
+            width: 60px;
             height: 4px;
-            background: var(--nhs-light-green);
+            background: linear-gradient(90deg, var(--accent-blue), var(--primary-dark));
+            border-radius: 2px;
         }
 
-        .gp-container {
+        .greeting-text {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        /* Action Buttons */
+        .nav-action-btn {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.6rem 1.2rem;
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 55, 101, 0.25);
+            background: linear-gradient(135deg, #23315a, #324167);
+            color: white;
+        }
+
+        .review-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-dark-blue));
+            border: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            padding: 0.7rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--accent-dark-blue), #4ab0b5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 26px rgba(114, 207, 212, 0.45);
+        }
+
+        .quick-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Glass Card Effect */
+        .glass-card {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 12px 40px var(--shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 16px 50px var(--shadow-medium);
+        }
+
+        /* Main Container Layout */
+        .main-container {
             display: grid;
             grid-template-columns: 300px 1fr 380px;
-            gap: 24px;
+            gap: 1.8rem;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px;
         }
 
+        /* Panel Styles */
         .panel {
-            background: var(--nhs-white);
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid var(--nhs-mid-grey);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: var(--glass-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 12px 40px var(--shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            box-shadow: 0 16px 50px var(--shadow-medium);
         }
 
         .panel-title {
-            color: var(--nhs-dark-blue);
-            font-weight: 600;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--nhs-light-green);
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--accent-blue);
+            font-size: 1.25rem;
         }
 
+        /* Patient Search */
+        .patient-search-card {
+            padding: 1.2rem;
+        }
+
+        .patient-summary {
+            background: rgba(114, 207, 212, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(114, 207, 212, 0.2);
+        }
+
+        .patient-id-display {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .record-count {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Record List */
         .record-row {
-            padding: 16px;
-            border-bottom: 1px solid var(--nhs-mid-grey);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             cursor: pointer;
             transition: all 0.2s ease;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
         }
 
         .record-row:hover {
-            background: #e9f2ff;
+            background: rgba(114, 207, 212, 0.08);
+            transform: translateX(4px);
         }
 
         .selected-row {
-            background: #dcecff !important;
-            border-left: 4px solid var(--nhs-blue);
+            background: rgba(114, 207, 212, 0.15) !important;
+            border-left: 4px solid var(--accent-blue);
+            box-shadow: 0 4px 12px rgba(114, 207, 212, 0.15);
         }
 
+        /* Status Badges */
         .status-badge {
-            padding: 6px 12px;
+            padding: 0.4rem 0.8rem;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
             color: white;
             text-transform: capitalize;
+            display: inline-block;
         }
 
-        .status-pending { background:#d9534f }
-        .status-under_review { background:#f0ad4e }
-        .status-reviewed { background:#5cb85c }
-        .status-action_required { background:#0275d8 }
+        .status-pending { background: var(--danger) }
+        .status-under_review { background: var(--warning) }
+        .status-reviewed { background: var(--success) }
+        .status-action_required { background: var(--info) }
 
+        /* Thumbnail Images */
         .thumb-img {
             width: 60px;
             height: 60px;
             object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid var(--nhs-mid-grey);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
+        /* Buttons */
         .btn-nhs-primary {
-            background: var(--nhs-blue);
-            border-color: var(--nhs-blue);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            border: none;
             color: white;
             font-weight: 600;
-            padding: 10px 20px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            transition: all 0.3s;
         }
 
         .btn-nhs-primary:hover {
-            background: var(--nhs-dark-blue);
-            border-color: var(--nhs-dark-blue);
+            background: linear-gradient(135deg, #23315a, #324167);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 55, 101, 0.25);
+            color: white;
         }
 
         .btn-nhs-secondary {
-            background: var(--nhs-white);
-            border-color: var(--nhs-blue);
-            color: var(--nhs-blue);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
             font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            transition: all 0.3s;
         }
 
         .btn-nhs-secondary:hover {
-            background: var(--nhs-light-grey);
-            border-color: var(--nhs-dark-blue);
-            color: var(--nhs-dark-blue);
+            background: var(--primary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 55, 101, 0.25);
         }
 
-        .info-text {
-            color: var(--nhs-grey);
-            font-size: 14px;
-        }
-
-        .patient-summary {
-            background: var(--nhs-light-grey);
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .patient-id-display {
-            font-weight: 600;
-            color: var(--nhs-dark-blue);
-            font-size: 18px;
-        }
-
-        .record-count {
-            font-size: 14px;
-            color: var(--nhs-grey);
-        }
-
+        /* Detail Sections */
         .detail-section {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(114, 207, 212, 0.2);
         }
 
         .detail-label {
             font-weight: 600;
-            color: var(--nhs-grey);
-            margin-bottom: 4px;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .detail-value {
-            color: var(--nhs-black);
+            color: var(--text-dark);
+            font-size: 1rem;
+            font-weight: 500;
         }
 
+        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: var(--nhs-grey);
+            padding: 3rem 1rem;
+            color: var(--text-light);
         }
 
         .empty-state-icon {
-            font-size: 48px;
-            color: var(--nhs-mid-grey);
-            margin-bottom: 16px;
+            font-size: 3rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid rgba(114, 207, 212, 0.3);
+            padding: 0.6rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 0.25rem rgba(114, 207, 212, 0.25);
+            background: white;
+        }
+
+        /* Info Text */
+        .info-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Badges */
+        .badge-count {
+            background: var(--primary-dark);
+            color: white;
+            font-weight: 600;
+            padding: 0.35rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Design */
         @media (max-width: 1200px) {
-            .gp-container {
+            .main-container {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 1.5rem;
             }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            
+            .quick-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5rem 1rem 2rem;
+            }
+            
+            .nav-action-btn, .review-btn {
+                width: 100%;
+                justify-content: center;
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .glass-card {
+                max-width: 100%;
+            }
+        }
+
+        /* Additional Modern Touches */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2.4rem;
+            color: var(--accent-blue);
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(114, 207, 212, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-dark-blue);
         }
     </style>
 </head>
 
 <body>
 
-<div class="gp-header">
-    <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
-        GP Clinical Dashboard
+<!-- Header Section -->
+<header class="dashboard-header">
+    <div>
+        <h1 class="dashboard-title">GP Clinical Dashboard</h1>
+        <p class="greeting-text">
+            <i class="bi bi-calendar3 me-1"></i>
+            <span id="currentDate"></span>
+        </p>
     </div>
-</div>
 
-<div class="gp-container">
+    <div class="d-flex gap-3 align-items-center flex-wrap">
+        <div class="quick-actions">
+            <button class="btn nav-action-btn me-2" onclick="loadSampleData()">
+                <i class="bi bi-people-fill me-1"></i>
+                View All Patients
+            </button>
+            <button class="btn nav-action-btn me-2" onclick="showUploadModal()">
+                <i class="bi bi-cloud-upload me-1"></i>
+                Upload Records
+            </button>
+            <button class="btn nav-action-btn me-2" onclick="exportData()">
+                <i class="bi bi-download me-1"></i>
+                Export Reports
+            </button>
+        </div>
 
-    <!-- LEFT PANEL -->
-    <div class="panel">
-        <h4 class="panel-title">Patient Search</h4>
+        <button class="btn review-btn shadow-sm">
+            <i class="bi bi-eye-fill"></i>
+            Review Pending Requests
+            <span class="badge bg-dark ms-2" id="pendingCount">0</span>
+        </button>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="main-container">
+
+    <!-- Left Panel - Patient Search -->
+    <div class="panel patient-search-card">
+        <h4 class="panel-title">
+            <i class="bi bi-search me-2"></i>
+            Patient Search
+        </h4>
         
         <div class="mb-4">
-            <label class="form-label fw-bold">Patient ID</label>
+            <label class="detail-label">Patient ID</label>
             <input id="gpPatientId" class="form-control mb-3" placeholder="Enter Patient ID (e.g., P004)">
-            <button id="gpLoadBtn" class="btn btn-nhs-primary w-100 mb-3">Load Patient Records</button>
             
-            <div class="patient-summary" id="patientSummary" style="display: none;">
+            <div class="d-flex gap-2 mb-3">
+                <button id="gpLoadBtn" class="btn btn-nhs-primary flex-grow-1">
+                    <i class="bi bi-folder2-open me-1"></i>
+                    Load Records
+                </button>
+                <button class="btn btn-nhs-secondary" onclick="clearSearch()">
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+            
+            <div class="patient-summary glass-card fade-in" id="patientSummary" style="display: none;">
                 <div class="patient-id-display" id="summaryPatientId"></div>
                 <div class="record-count" id="summaryRecordCount"></div>
                 <div class="record-count" id="summaryLastUpload"></div>
             </div>
         </div>
 
-        <hr>
+        <hr class="my-4">
 
         <div class="mt-4">
-            <h6 class="fw-bold text-dark mb-3">Filter Records</h6>
+            <div class="section-header">
+                <h6 class="fw-bold text-dark mb-0">Filter Records</h6>
+                <span class="badge-count" id="filterCount">0</span>
+            </div>
+            
             <select id="filterStatus" class="form-select mb-3">
                 <option value="">All statuses</option>
-                <option value="pending">Pending Review</option>
-                <option value="under_review">Under Review</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="action_required">Action Required</option>
+                <option value="pending">⏳ Pending Review</option>
+                <option value="under_review">🔍 Under Review</option>
+                <option value="reviewed">✅ Reviewed</option>
+                <option value="action_required">⚠️ Action Required</option>
             </select>
 
-            <button id="applyFilter" class="btn btn-nhs-secondary w-100">Apply Filter</button>
-            <button id="clearFilter" class="btn btn-outline-secondary w-100 mt-2">Clear Filter</button>
+            <div class="d-flex gap-2">
+                <button id="applyFilter" class="btn btn-nhs-primary flex-grow-1">Apply Filter</button>
+                <button id="clearFilter" class="btn btn-nhs-secondary">Clear</button>
+            </div>
         </div>
     </div>
 
-    <!-- MIDDLE PANEL -->
+    <!-- Middle Panel - Records List -->
     <div class="panel">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="panel-title mb-0">Patient Records</h4>
-            <span class="badge bg-secondary" id="gpRecordCount">0 records</span>
+        <div class="section-header mb-3">
+            <h4 class="panel-title mb-0">
+                <i class="bi bi-file-earmark-medical me-2"></i>
+                Patient Records
+            </h4>
+            <span class="badge-count" id="gpRecordCount">0 records</span>
         </div>
         
         <div id="gpRecordsList" class="mt-3">
             <div class="empty-state">
                 <div class="empty-state-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
-                        <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
-                    </svg>
+                    <i class="bi bi-folder2"></i>
                 </div>
                 <h5>No patient records loaded</h5>
                 <p class="info-text">Enter a Patient ID and click "Load Patient Records" to begin</p>
+                <button class="btn btn-nhs-secondary mt-3" onclick="loadSampleData()">
+                    <i class="bi bi-lightning-charge me-1"></i>
+                    Load Sample Data
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- RIGHT PANEL -->
+    <!-- Right Panel - Record Details -->
     <div class="panel" id="detailPanel">
-        <h4 class="panel-title">Record Details</h4>
+        <div class="section-header">
+            <h4 class="panel-title mb-0">
+                <i class="bi bi-clipboard-data me-2"></i>
+                Record Details
+            </h4>
+            <span class="badge bg-purple text-white" id="detailStatusIndicator">-</span>
+        </div>
+        
         <p class="info-text mb-4">Select a record to view details and update status</p>
 
         <div id="detailContent" style="display:none;">
-            <div class="detail-section">
+            <div class="detail-section fade-in">
                 <div class="detail-label">File Name</div>
-                <div class="detail-value" id="detailFile"></div>
+                <div class="detail-value" id="detailFile">
+                    <i class="bi bi-file-earmark me-1"></i>
+                    <span id="detailFileName">-</span>
+                </div>
             </div>
             
-            <div class="detail-section">
+            <div class="detail-section fade-in">
                 <div class="detail-label">Upload Date</div>
-                <div class="detail-value" id="detailDate"></div>
+                <div class="detail-value" id="detailDate">
+                    <i class="bi bi-calendar me-1"></i>
+                    <span id="detailDateValue">-</span>
+                </div>
             </div>
             
-            <div class="detail-section">
+            <div class="detail-section fade-in">
                 <div class="detail-label">File Type</div>
-                <div class="detail-value" id="detailType"></div>
+                <div class="detail-value" id="detailType">
+                    <i class="bi bi-card-text me-1"></i>
+                    <span id="detailTypeValue">-</span>
+                </div>
             </div>
             
-            <div class="detail-section">
+            <div class="detail-section fade-in">
                 <div class="detail-label">Current Status</div>
                 <div class="detail-value">
                     <span id="detailStatusBadge" class="status-badge"></span>
                 </div>
             </div>
 
-            <div class="detail-section">
-                <label class="detail-label">Update Status</label>
+            <div class="detail-section fade-in">
+                <label class="detail-label">
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Update Status
+                </label>
                 <select id="detailStatus" class="form-select mb-3">
-                    <option value="pending">Pending Review</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="reviewed">Reviewed</option>
-                    <option value="action_required">Action Required</option>
+                    <option value="pending">⏳ Pending Review</option>
+                    <option value="under_review">🔍 Under Review</option>
+                    <option value="reviewed">✅ Reviewed</option>
+                    <option value="action_required">⚠️ Action Required</option>
                 </select>
             </div>
 
-            <div class="detail-section">
-                <label class="detail-label">Clinical Notes</label>
-                <textarea class="form-control mb-3" id="detailNotes" rows="5" placeholder="Add clinical notes or feedback for the patient..."></textarea>
+            <div class="detail-section fade-in">
+                <label class="detail-label">
+                    <i class="bi bi-pencil-square me-1"></i>
+                    Clinical Notes
+                </label>
+                <textarea class="form-control mb-3" id="detailNotes" rows="5" 
+                          placeholder="Add clinical notes or feedback for the patient..."></textarea>
             </div>
 
-            <div class="d-flex gap-2">
-                <button id="saveDetail" class="btn btn-nhs-primary flex-grow-1">Save Changes</button>
-                <button id="deleteDetail" class="btn btn-danger">Delete</button>
+            <div class="d-flex gap-2 mt-4">
+                <button id="saveDetail" class="btn btn-nhs-primary flex-grow-1">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Save Changes
+                </button>
+                <button id="deleteDetail" class="btn btn-danger">
+                    <i class="bi bi-trash"></i>
+                </button>
             </div>
-            <div id="detailMsg" class="mt-2 text-center"></div>
+            <div id="detailMsg" class="mt-3 text-center small"></div>
         </div>
     </div>
 
+</div>
+
+<!-- Success Notification -->
+<div id="successToast" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span id="toastMessage">Changes saved successfully!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
 </div>
 
 <script src="js/bootstrap.bundle.min.js"></script>
@@ -316,70 +667,103 @@
 <script src="js/gp.js"></script>
 
 <script>
-    // Enhanced GP dashboard functionality
+    // Set current date
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // Initialize Bootstrap components
+    var toastEl = document.getElementById('successToast');
+    var toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+
+    // Enhanced functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const clearFilterBtn = document.getElementById('clearFilter');
-        const patientSummary = document.getElementById('patientSummary');
-        const summaryPatientId = document.getElementById('summaryPatientId');
-        const summaryRecordCount = document.getElementById('summaryRecordCount');
-        const summaryLastUpload = document.getElementById('summaryLastUpload');
-        const gpRecordCount = document.getElementById('gpRecordCount');
-        
-        // Clear filter functionality
-        clearFilterBtn.addEventListener('click', function() {
-            document.getElementById('filterStatus').value = '';
-            if (currentRecords && currentRecords.length > 0) {
-                renderRecordList(currentRecords);
-                updateRecordCount(currentRecords.length);
+        // Clear search function
+        window.clearSearch = function() {
+            document.getElementById('gpPatientId').value = '';
+            document.getElementById('gpRecordsList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-folder2"></i>
+                    </div>
+                    <h5>No patient records loaded</h5>
+                    <p class="info-text">Enter a Patient ID and click "Load Patient Records" to begin</p>
+                </div>`;
+            document.getElementById('patientSummary').style.display = 'none';
+            document.getElementById('detailContent').style.display = 'none';
+            document.getElementById('gpRecordCount').textContent = '0 records';
+            document.getElementById('filterCount').textContent = '0';
+        };
+
+        // Load sample data
+        window.loadSampleData = function() {
+            document.getElementById('gpPatientId').value = 'P004';
+            if (window.loadGpRecords) {
+                window.loadGpRecords();
             }
-        });
-        
-        // Update patient summary
-        function updatePatientSummary(patientId, records) {
-            if (records && records.length > 0) {
-                patientSummary.style.display = 'block';
-                summaryPatientId.textContent = `Patient: ${patientId}`;
-                summaryRecordCount.textContent = `${records.length} record(s)`;
-                
-                // Find most recent upload
-                const latest = records.reduce((latest, record) => {
-                    return record.createdAt > latest.createdAt ? record : latest;
-                });
-                
-                const latestDate = new Date(latest.createdAt * 1000).toLocaleDateString();
-                summaryLastUpload.textContent = `Last upload: ${latestDate}`;
-            } else {
-                patientSummary.style.display = 'none';
+            showToast('Sample data loaded successfully');
+        };
+
+        // Export data function
+        window.exportData = function() {
+            showToast('Export feature coming soon!');
+        };
+
+        // Show upload modal
+        window.showUploadModal = function() {
+            showToast('Upload modal will be implemented here');
+        };
+
+        // Show toast notification
+        window.showToast = function(message) {
+            document.getElementById('toastMessage').textContent = message;
+            toast.show();
+        };
+
+        // Filter counter
+        function updateFilterCounter(records) {
+            const filterStatus = document.getElementById('filterStatus').value;
+            if (!filterStatus) {
+                document.getElementById('filterCount').textContent = records?.length || 0;
+                return;
             }
+            const filtered = records?.filter(r => r.status === filterStatus) || [];
+            document.getElementById('filterCount').textContent = filtered.length;
         }
-        
-        // Update record count display
-        function updateRecordCount(count) {
-            gpRecordCount.textContent = `${count} record${count !== 1 ? 's' : ''}`;
-        }
-        
-        // Override the existing loadGpRecords function to include summary updates
+
+        // Override existing functions with enhancements
         const originalLoadGpRecords = window.loadGpRecords;
         window.loadGpRecords = async function() {
-            const pid = gpInput.value.trim();
+            const pid = document.getElementById('gpPatientId').value.trim();
             if (!pid) return;
 
             const data = await apiGet(`/records?patientId=${pid}`);
+            const gpRecordsList = document.getElementById('gpRecordsList');
+            const detailContent = document.getElementById('detailContent');
+            
             gpRecordsList.innerHTML = "";
             detailContent.style.display = "none";
 
             if (!data || data.error) {
-                gpRecordsList.innerHTML = `<div class="empty-state">
-                    <div class="empty-state-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394A.5.5 0 0 0 4.893 16h6.214a.5.5 0 0 0 .353-.146l4.394-4.394A.5.5 0 0 0 16 11.107V4.893a.5.5 0 0 0-.146-.353L11.46.146zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                        </svg>
-                    </div>
-                    <h5>Unable to load records</h5>
-                    <p class="info-text">Please check the Patient ID and try again</p>
-                </div>`;
+                gpRecordsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <h5>Unable to load records</h5>
+                        <p class="info-text">Please check the Patient ID and try again</p>
+                        <button class="btn btn-nhs-secondary mt-3" onclick="loadSampleData()">
+                            <i class="bi bi-lightning-charge me-1"></i>
+                            Load Sample Data
+                        </button>
+                    </div>`;
+                
                 updatePatientSummary(pid, []);
                 updateRecordCount(0);
+                updateFilterCounter([]);
                 return;
             }
 
@@ -387,29 +771,88 @@
             renderRecordList(currentRecords);
             updatePatientSummary(pid, currentRecords);
             updateRecordCount(currentRecords.length);
+            updateFilterCounter(currentRecords);
+            updatePendingCount(currentRecords);
         };
-        
-        // Override selectRecord to show more details
+
+        // Update pending count
+        function updatePendingCount(records) {
+            const pending = records?.filter(r => r.status === 'pending').length || 0;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        // Override selectRecord
         const originalSelectRecord = window.selectRecord;
         window.selectRecord = function(rec) {
             originalSelectRecord(rec);
             
-            // Update file type
+            // Add fade-in animation
+            document.getElementById('detailContent').classList.add('fade-in');
+            
+            // Update all detail fields
+            document.getElementById('detailFileName').textContent = rec.filename || 'Unknown';
+            document.getElementById('detailDateValue').textContent = 
+                new Date(rec.createdAt * 1000).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            
             const fileType = rec.contentType || 'Unknown';
-            document.getElementById('detailType').textContent = fileType.split('/')[1]?.toUpperCase() || 'FILE';
+            document.getElementById('detailTypeValue').textContent = 
+                fileType.split('/')[1]?.toUpperCase() || 'FILE';
             
-            // Update status badge
-            const badgeClass = {
-                pending: "status-pending",
-                under_review: "status-under_review",
-                reviewed: "status-reviewed",
-                action_required: "status-action_required"
-            }[rec.status] || "status-pending";
+            // Update status badge and indicator
+            const statusConfig = {
+                pending: { class: "status-pending", icon: "⏳", text: "Pending" },
+                under_review: { class: "status-under_review", icon: "🔍", text: "Under Review" },
+                reviewed: { class: "status-reviewed", icon: "✅", text: "Reviewed" },
+                action_required: { class: "status-action_required", icon: "⚠️", text: "Action Required" }
+            };
             
-            const statusText = rec.status.replace(/_/g, ' ');
-            document.getElementById('detailStatusBadge').className = `status-badge ${badgeClass}`;
-            document.getElementById('detailStatusBadge').textContent = statusText;
+            const config = statusConfig[rec.status] || statusConfig.pending;
+            const badge = document.getElementById('detailStatusBadge');
+            badge.className = `status-badge ${config.class}`;
+            badge.textContent = `${config.icon} ${config.text}`;
+            
+            document.getElementById('detailStatusIndicator').textContent = config.icon;
+            document.getElementById('detailStatus').value = rec.status;
+            
+            // Set notes if available
+            if (rec.notes) {
+                document.getElementById('detailNotes').value = rec.notes;
+            }
         };
+
+        // Apply filter
+        document.getElementById('applyFilter').addEventListener('click', function() {
+            if (!currentRecords) return;
+            const filterStatus = document.getElementById('filterStatus').value;
+            let filtered = currentRecords;
+            
+            if (filterStatus) {
+                filtered = currentRecords.filter(r => r.status === filterStatus);
+            }
+            
+            renderRecordList(filtered);
+            updateRecordCount(filtered.length);
+            updateFilterCounter(currentRecords);
+        });
+
+        // Clear filter
+        document.getElementById('clearFilter').addEventListener('click', function() {
+            document.getElementById('filterStatus').value = '';
+            if (currentRecords && currentRecords.length > 0) {
+                renderRecordList(currentRecords);
+                updateRecordCount(currentRecords.length);
+                updateFilterCounter(currentRecords);
+            }
+        });
+
+        // Initialize
+        updatePendingCount([]);
     });
 </script>
 
