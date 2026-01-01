@@ -28,6 +28,7 @@ import logging
 import requests
 
 UPLOAD_LOGIC_APP_URL = os.environ.get("UPLOAD_LOGIC_APP_URL")
+REVIEW_LOGIC_APP_URL = os.environ.get("REVIEW_LOGIC_APP_URL")
 
 
 # ----------------------------------------------------------
@@ -114,11 +115,13 @@ def upload():
     if UPLOAD_LOGIC_APP_URL:
         try:
             requests.post(UPLOAD_LOGIC_APP_URL, json={
-                "recordId": record["id"],
-                "patientId": record["patientId"],
-                "blobUrl": record["blobUrl"],
-                "status": record["status"]
-            })
+    "recordId": record["id"],
+    "patientId": record["patientId"],
+    "blobUrl": record["blobUrl"],
+    "status": record["status"],
+    "uploadedAt": record["createdAt"]
+})
+
         except Exception as e:
             logger.warning(f"Logic App upload trigger failed: {e}")
 
@@ -201,10 +204,25 @@ def update_record(record_id):
         updated = update_record_by_id(record_id, updates)
         if not updated:
             return json_error("record not found", 404)
+
+        #  Trigger Logic App if reviewed
+        if updates.get("status") == "reviewed" and REVIEW_LOGIC_APP_URL:
+            try:
+                requests.post(REVIEW_LOGIC_APP_URL, json={
+                    "recordId": record_id,
+                    "patientId": updated["patientId"],
+                    "status": "reviewed",
+                    "updatedAt": updates["updatedAt"]
+                })
+            except Exception as e:
+                logger.warning(f"Review Logic App trigger failed: {e}")
+
         return jsonify(updated), 200
+
     except Exception as e:
         logger.error(f"Error updating record {record_id}: {e}")
         return json_error("failed to update record", 500)
+
 
 
 # ----------------------------------------------------------
