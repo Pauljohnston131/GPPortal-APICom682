@@ -208,12 +208,19 @@ def update_record(record_id):
         #  Trigger Logic App if reviewed
         if updates.get("status") == "reviewed" and REVIEW_LOGIC_APP_URL:
             try:
-                requests.post(REVIEW_LOGIC_APP_URL, json={
-                    "recordId": record_id,
-                    "patientId": updated["patientId"],
-                    "status": "reviewed",
-                    "updatedAt": updates["updatedAt"]
-                })
+                logger.info(f"Sending review event to Logic App: record={record_id}, status={updates.get('status')}")
+
+                requests.post(
+    REVIEW_LOGIC_APP_URL,
+    json={
+        "recordId": record_id,
+        "patientId": updated["patientId"],
+        "status": "reviewed",
+        "updatedAt": updates["updatedAt"]
+    },
+    headers={"Content-Type": "application/json"}
+)
+
             except Exception as e:
                 logger.warning(f"Review Logic App trigger failed: {e}")
 
