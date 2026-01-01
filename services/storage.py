@@ -25,6 +25,13 @@ def upload_bytes(name: str, data: bytes, content_type: str = None):
     return blob.url
 
 # -------------------------------
+# DELETE
+# -------------------------------
+def delete_blob(blob_name: str):
+    blob = get_blob_client(blob_name)
+    blob.delete_blob()
+
+# -------------------------------
 # DOWNLOAD FOR IMAGE PREVIEW — FIXED
 # -------------------------------
 def download_blob_bytes(blob_name: str):

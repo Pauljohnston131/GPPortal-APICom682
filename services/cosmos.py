@@ -72,16 +72,22 @@ def get_record_by_id(record_id: str) -> Optional[Dict]:
 
 
 def update_record_by_id(record_id: str, updates: Dict) -> Optional[Dict]:
-    """
-    Merge updates into existing record and replace item in Cosmos.
-    """
     container = get_container()
     doc = get_record_by_id(record_id)
     if not doc:
         return None
 
+    patch_ops = []
+    for k, v in updates.items():
+        patch_ops.append({"op": "add", "path": f"/{k}", "value": v})
+
+    container.patch_item(
+        item=doc["id"],
+        partition_key=doc["patientId"],
+        patch_operations=patch_ops,
+    )
+
     doc.update(updates)
-    container.replace_item(item=doc["id"], body=doc)
     return doc
 
 

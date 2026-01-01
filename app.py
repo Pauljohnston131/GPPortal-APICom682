@@ -12,6 +12,7 @@ from flask import Response
 from services.storage import download_blob_bytes
 from flask_cors import CORS
 from services.storage import upload_bytes
+from services.storage import delete_blob
 from services.cosmos import (
     upsert_record,
     list_records,
@@ -196,13 +197,18 @@ def update_record(record_id):
 @app.delete("/record/<record_id>")
 def delete_record(record_id):
     try:
-        deleted = delete_record_by_id(record_id)
-        if not deleted:
+        rec = get_record_by_id(record_id)
+        if not rec:
             return json_error("record not found", 404)
-        return jsonify({"message": "record deleted"}), 200
+
+        delete_blob(rec["blobName"])
+        delete_record_by_id(record_id)
+
+        return jsonify({"message": "record and blob deleted"}), 200
     except Exception as e:
         logger.error(f"Error deleting record {record_id}: {e}")
         return json_error("failed to delete record", 500)
+
 
 
 # ----------------------------------------------------------
