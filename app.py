@@ -25,6 +25,9 @@ import os
 import uuid
 import time
 import logging
+import requests
+
+UPLOAD_LOGIC_APP_URL = os.environ.get("UPLOAD_LOGIC_APP_URL")
 
 
 # ----------------------------------------------------------
@@ -107,6 +110,18 @@ def upload():
         logger.error(f"Cosmos upsert failed: {e}")
         return json_error("database error", 500)
 
+        # Call Logic App trigger
+    if UPLOAD_LOGIC_APP_URL:
+        try:
+            requests.post(UPLOAD_LOGIC_APP_URL, json={
+                "recordId": record["id"],
+                "patientId": record["patientId"],
+                "blobUrl": record["blobUrl"],
+                "status": record["status"]
+            })
+        except Exception as e:
+            logger.warning(f"Logic App upload trigger failed: {e}")
+
     logger.info(f"File uploaded for patient {patient_id}")
     return jsonify(
         {
@@ -114,6 +129,7 @@ def upload():
             "record": record,
         }
     ), 201
+
 
 
 # ----------------------------------------------------------
