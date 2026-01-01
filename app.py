@@ -29,6 +29,7 @@ import requests
 
 UPLOAD_LOGIC_APP_URL = os.environ.get("UPLOAD_LOGIC_APP_URL")
 REVIEW_LOGIC_APP_URL = os.environ.get("REVIEW_LOGIC_APP_URL")
+AUDIT_LOGIC_APP_URL = os.environ.get("AUDIT_LOGIC_APP_URL")
 
 
 # ----------------------------------------------------------
@@ -242,13 +243,35 @@ def delete_record(record_id):
         if not rec:
             return json_error("record not found", 404)
 
+        # Delete blob from storage
         delete_blob(rec["blobName"])
+
+        # Delete metadata from Cosmos DB
         delete_record_by_id(record_id)
 
+        # Trigger audit Logic App
+        if AUDIT_LOGIC_APP_URL:
+            try:
+                import requests
+                requests.post(
+                    AUDIT_LOGIC_APP_URL,
+                    json={
+                        "recordId": record_id,
+                        "patientId": rec["patientId"],
+                        "action": "deleted",
+                        "timestamp": int(time.time())
+                    },
+                    headers={"Content-Type": "application/json"}
+                )
+            except Exception as e:
+                logger.warning(f"Audit Logic App trigger failed: {e}")
+
         return jsonify({"message": "record and blob deleted"}), 200
+
     except Exception as e:
         logger.error(f"Error deleting record {record_id}: {e}")
         return json_error("failed to delete record", 500)
+
 
 
 
