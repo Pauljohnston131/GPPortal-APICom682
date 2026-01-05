@@ -178,23 +178,26 @@ def get_record(record_id):
         return json_error("failed to fetch record", 500)
 
 
-# ----------------------------------------------------------
-# Update a record (GP review: status + notes)
-# ----------------------------------------------------------
 @app.put("/record/<record_id>")
 def update_record(record_id):
     """
     Body (JSON), any of:
-      - status: string (pending, under_review, reviewed, action_required, etc.)
+      - status: string
       - gpNotes: string
+      - aiTags: list of strings
     """
     data = request.get_json(silent=True) or {}
 
     updates = {}
+
     if "status" in data:
         updates["status"] = str(data["status"]).strip()
+
     if "gpNotes" in data:
         updates["gpNotes"] = str(data["gpNotes"]).strip()
+
+    if "aiTags" in data:
+        updates["aiTags"] = data["aiTags"]
 
     if not updates:
         return json_error("no fields to update", 400)
@@ -206,22 +209,20 @@ def update_record(record_id):
         if not updated:
             return json_error("record not found", 404)
 
-        #  Trigger Logic App if reviewed
+        # Trigger Logic App if reviewed
         if updates.get("status") == "reviewed" and REVIEW_LOGIC_APP_URL:
             try:
                 logger.info(f"Sending review event to Logic App: record={record_id}, status={updates.get('status')}")
-
                 requests.post(
-    REVIEW_LOGIC_APP_URL,
-    json={
-        "recordId": record_id,
-        "patientId": updated["patientId"],
-        "status": "reviewed",
-        "updatedAt": updates["updatedAt"]
-    },
-    headers={"Content-Type": "application/json"}
-)
-
+                    REVIEW_LOGIC_APP_URL,
+                    json={
+                        "recordId": record_id,
+                        "patientId": updated["patientId"],
+                        "status": "reviewed",
+                        "updatedAt": updates["updatedAt"]
+                    },
+                    headers={"Content-Type": "application/json"}
+                )
             except Exception as e:
                 logger.warning(f"Review Logic App trigger failed: {e}")
 
@@ -230,8 +231,6 @@ def update_record(record_id):
     except Exception as e:
         logger.error(f"Error updating record {record_id}: {e}")
         return json_error("failed to update record", 500)
-
-
 
 # ----------------------------------------------------------
 # Delete a record (GP-only action in future)
