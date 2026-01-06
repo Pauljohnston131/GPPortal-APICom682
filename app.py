@@ -74,10 +74,10 @@ def upload():
       - file (image/pdf/etc)
     Stores file in Blob Storage and metadata in Cosmos DB.
     """
-    if "file" not in request.files:
+    if "files" not in request.files:
         return json_error("file missing", 400)
 
-    file = request.files["file"]
+    file = request.files.get("files")
     patient_id = (request.form.get("patientId") or "").strip()
 
     if not patient_id:
