@@ -30,6 +30,7 @@ import requests
 UPLOAD_LOGIC_APP_URL = os.environ.get("UPLOAD_LOGIC_APP_URL")
 REVIEW_LOGIC_APP_URL = os.environ.get("REVIEW_LOGIC_APP_URL")
 AUDIT_LOGIC_APP_URL = os.environ.get("AUDIT_LOGIC_APP_URL")
+AI_LOGIC_APP_URL = os.environ.get("AI_LOGIC_APP_URL")
 
 
 # ----------------------------------------------------------
@@ -98,7 +99,7 @@ def upload():
         "id": str(uuid.uuid4()),
         "patientId": patient_id,
         "blobUrl": blob_url,
-        "blobName": blob_name,           # ← NEW: this is the clean relative path
+        "blobName": blob_name,
         "originalName": file.filename,
         "contentType": file.mimetype,
         "status": "pending",
@@ -112,21 +113,42 @@ def upload():
         logger.error(f"Cosmos upsert failed: {e}")
         return json_error("database error", 500)
 
-        # Call Logic App trigger
+    # Trigger Upload Logic App (email / audit)
     if UPLOAD_LOGIC_APP_URL:
         try:
-            requests.post(UPLOAD_LOGIC_APP_URL, json={
-    "recordId": record["id"],
-    "patientId": record["patientId"],
-    "blobUrl": record["blobUrl"],
-    "status": record["status"],
-    "uploadedAt": record["createdAt"]
-})
-
+            requests.post(
+                UPLOAD_LOGIC_APP_URL,
+                json={
+                    "recordId": record["id"],
+                    "patientId": record["patientId"],
+                    "blobUrl": record["blobUrl"],
+                    "status": record["status"],
+                    "uploadedAt": record["createdAt"]
+                },
+                headers={"Content-Type": "application/json"},
+                timeout=5
+            )
         except Exception as e:
-            logger.warning(f"Logic App upload trigger failed: {e}")
+            logger.warning(f"Upload Logic App trigger failed: {e}")
+
+    # Trigger AI Logic App (Computer Vision)
+    if AI_LOGIC_APP_URL:
+        try:
+            requests.post(
+                AI_LOGIC_APP_URL,
+                json={
+                    "recordId": record["id"],
+                    "patientId": record["patientId"],
+                    "blobUrl": record["blobUrl"]
+                },
+                headers={"Content-Type": "application/json"},
+                timeout=5
+            )
+        except Exception as e:
+            logger.warning(f"AI Logic App trigger failed: {e}")
 
     logger.info(f"File uploaded for patient {patient_id}")
+
     return jsonify(
         {
             "message": "uploaded",
