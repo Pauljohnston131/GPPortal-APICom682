@@ -117,17 +117,17 @@ def upload():
     if UPLOAD_LOGIC_APP_URL:
         try:
             requests.post(
-                UPLOAD_LOGIC_APP_URL,
-                json={
-                    "recordId": record["id"],
-                    "patientId": record["patientId"],
-                    "blobUrl": record["blobUrl"],
-                    "status": record["status"],
-                    "uploadedAt": record["createdAt"]
-                },
-                headers={"Content-Type": "application/json"},
-                timeout=5
-            )
+    AI_LOGIC_APP_URL,
+    json={
+        "recordId": record["id"],
+        "patientId": record["patientId"],
+        "blobUrl": record["blobUrl"],
+        "contentType": record["contentType"]
+    },
+    headers={"Content-Type": "application/json"},
+    timeout=5
+)
+
         except Exception as e:
             logger.warning(f"Upload Logic App trigger failed: {e}")
 
