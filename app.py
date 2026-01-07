@@ -105,6 +105,7 @@ def upload():
         "contentType": file.mimetype,
         "status": "pending",
         "gpNotes": "",
+        "ocrText": "",
         "createdAt": int(time.time()),
     }
 
@@ -208,6 +209,7 @@ def update_record(record_id):
       - status: string
       - gpNotes: string
       - aiTags: list of strings
+      - ocrText: string
     """
     data = request.get_json(silent=True) or {}
 
@@ -221,6 +223,9 @@ def update_record(record_id):
 
     if "aiTags" in data:
         updates["aiTags"] = data["aiTags"]
+
+    if "ocrText" in data:                          
+        updates["ocrText"] = str(data["ocrText"]).strip()
 
     if not updates:
         return json_error("no fields to update", 400)
