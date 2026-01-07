@@ -71,9 +71,10 @@ def upload():
     """
     Accepts multipart/form-data:
       - patientId (string)
-      - file (image/pdf/etc)
+      - files (file)
     Stores file in Blob Storage and metadata in Cosmos DB.
     """
+
     if "files" not in request.files:
         return json_error("file missing", 400)
 
@@ -113,25 +114,24 @@ def upload():
         logger.error(f"Cosmos upsert failed: {e}")
         return json_error("database error", 500)
 
-    # Trigger Upload Logic App (email / audit)
+    # Trigger Upload Logic App
     if UPLOAD_LOGIC_APP_URL:
         try:
             requests.post(
-    AI_LOGIC_APP_URL,
-    json={
-        "recordId": record["id"],
-        "patientId": record["patientId"],
-        "blobUrl": record["blobUrl"],
-        "contentType": record["contentType"]
-    },
-    headers={"Content-Type": "application/json"},
-    timeout=5
-)
-
+                UPLOAD_LOGIC_APP_URL,
+                json={
+                    "recordId": record["id"],
+                    "patientId": record["patientId"],
+                    "blobUrl": record["blobUrl"],
+                    "contentType": record["contentType"]
+                },
+                headers={"Content-Type": "application/json"},
+                timeout=5
+            )
         except Exception as e:
             logger.warning(f"Upload Logic App trigger failed: {e}")
 
-    # Trigger AI Logic App (Computer Vision)
+    # Trigger AI Logic App
     if AI_LOGIC_APP_URL:
         try:
             requests.post(
@@ -139,7 +139,8 @@ def upload():
                 json={
                     "recordId": record["id"],
                     "patientId": record["patientId"],
-                    "blobUrl": record["blobUrl"]
+                    "blobUrl": record["blobUrl"],
+                    "contentType": record["contentType"]
                 },
                 headers={"Content-Type": "application/json"},
                 timeout=5
